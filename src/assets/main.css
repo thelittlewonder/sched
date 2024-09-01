@@ -1,0 +1,19 @@
+@import './reset.css';
+@import url('https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400,700&display=swap');
+
+#app {
+    font-family: 'Martian Mono';
+    font-style: normal;
+}
+
+:root{
+    --office-base-color: #2874A6;
+    --office-offbase-color: #D6EAF7;
+    --wfh-base-color: #127A65;
+    --wfh-offbase-color: #D0ECE7;
+    --remote-base-color: #76448A;
+    --remote-offbase-color: #EBDEF0;
+    --pto-base-color: #B9770C;
+    --pto-offbase-color: #FDEBD0;
+    --default-base-color: #17202A;
+}
