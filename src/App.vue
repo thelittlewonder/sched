@@ -82,9 +82,6 @@ export default {
 </script>
 
 <template>
-  <header>
-  </header>
-
   <main>
     <div class="sidebar">
 
@@ -128,7 +125,7 @@ export default {
 main {
   display: flex;
   flex-direction: row;
-
+  //max-width: 1440px;
   .actionbar{
     display: flex;
     flex-direction: row;

@@ -4,9 +4,16 @@
 #app {
     font-family: 'Martian Mono';
     font-style: normal;
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    height: 100vh;
+
 }
 
-:root{
+:root {
     --office-base-color: #2874A6;
     --office-offbase-color: #D6EAF7;
     --wfh-base-color: #127A65;
