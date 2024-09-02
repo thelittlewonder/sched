@@ -61,7 +61,7 @@ export default {
     },
     downloadAsJpg() {
       const captureElement = document.getElementById('capture');
-      
+
       // Use html2canvas to capture the div as a canvas
       html2canvas(captureElement).then(canvas => {
         // Convert the canvas to a data URL in JPG format
@@ -82,6 +82,10 @@ export default {
 </script>
 
 <template>
+  <aside>
+    <p>This is a big screen activity dawg. <a href='https://threads.net/abh_.shek' class="threads">@ me</a> if you want.
+    </p>
+  </aside>
   <main>
     <div class="sidebar">
 
@@ -91,7 +95,8 @@ export default {
           <span>{{ formattedMonthYear }}</span>
           <img src="./assets/icons/forward.svg" alt="forward" @click="nextMonth" />
         </div>
-        <img src="./assets/icons/download.svg" alt="download image" class="download-btn" title="Download as jpg" @click="downloadAsJpg"/>
+        <img src="./assets/icons/download.svg" alt="download image" class="download-btn" title="Download as jpg"
+          @click="downloadAsJpg" />
       </div>
 
       <div class="details">
@@ -103,7 +108,8 @@ export default {
         <p class="divider">
           –
         </p>
-        <a href='https://threads.net/abh_.shek' class="threads"><img src="./assets/icons/threads.svg" />built by
+        <a href='https://threads.net/abh_.shek' class="threads"><img src="./assets/icons/threads.svg"
+            alt="threads" />built by
           abh_.shek</a>
       </div>
 
@@ -122,21 +128,84 @@ export default {
 </template>
 
 <style scoped lang="scss">
+@media (max-width: 1023px) {
+  main {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1299px) {
+  aside {
+    display: none !important;
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+
+    .sidebar {
+      padding: 24px;
+    }
+  }
+}
+
+@media (min-width: 1300px) {
+  aside {
+    display: none !important;
+  }
+
+  main {
+    display: flex;
+    flex-direction: row;
+
+    .sidebar {
+      padding: 40px;
+      max-width: 420px;
+    }
+  }
+}
+
+aside {
+  color: var(--default-base-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 14px;
+  line-height: 24px;
+  padding: 20px;
+
+  p {
+    text-align: center;
+
+    a {
+      opacity: 0.5;
+      color: var(--default-base-color);
+      text-decoration: none;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
+
 main {
   display: flex;
-  flex-direction: row;
-  .actionbar{
+  max-width: 1800px;
+
+  .actionbar {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    .download-btn{
+
+    .download-btn {
       cursor: pointer;
     }
   }
 
   .sidebar {
     background: #F7F9F9;
-    padding: 40px;
 
     .divider {
       margin: 24px 0;

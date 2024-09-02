@@ -136,6 +136,7 @@ export default {
         transition: border-color 0.3s;
         width: 75%;
         height: 15px;
+
         &:hover {
             border-bottom: 1px solid var(--remote-base-color);
         }
@@ -174,6 +175,9 @@ export default {
 
 .hover-pto {
 
+
+    background-color: var(--pto-offbase-color);
+
     .status-options {
         opacity: 1;
     }
@@ -182,11 +186,13 @@ export default {
         opacity: 0.5;
     }
 
-    background-color: var(--pto-offbase-color);
 }
 
 .hover-wfh {
 
+
+    background-color: var(--wfh-offbase-color);
+
     .status-options {
         opacity: 1;
     }
@@ -195,12 +201,9 @@ export default {
         opacity: 0.5;
     }
 
-    background-color: var(--wfh-offbase-color);
 }
 
 .hover-remote {
-
-
 
     background-color: var(--remote-offbase-color);
 
