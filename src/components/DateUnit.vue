@@ -6,7 +6,8 @@ export default {
             selectedState: '',
             stateName: ' ',
             states: [" ", "Office", "WFH", "Remote", "PTO"],
-            remoteNote: 'Country'
+            remoteNote: 'Country',
+            count: 0
         };
     },
     methods: {
@@ -35,12 +36,28 @@ export default {
             }
         },
         setStateName(stateName) {
+            event.stopPropagation();
             this.updateStateName(stateName, 'active');
             this.selectedState = stateName
         },
         onInput(e) {
             console.log(e.target.innerText);
         },
+        alternativeClickThrough() {
+            let localState
+            this.count++
+            localState = this.states[this.count]
+            if (this.count == 5) {
+                this.count = 0
+            }
+            if (this.count == 0) {
+                this.currentState = 'hover-blank'
+                this.stateName = this.states[0]
+                this.selectedState = ''
+            } else {
+                this.setStateName(localState)
+            }
+        }
     },
     computed: {
         currentClass() {
@@ -62,7 +79,7 @@ export default {
 
 <template>
     <div class="default" @mouseenter="setState('hover-blank')" @mouseleave="resetState" :class="currentClass"
-        :style="{ pointerEvents: this.calDate.date === null ? 'none' : 'auto' }">
+        :style="{ pointerEvents: this.calDate.date === null ? 'none' : 'auto' }" @click="alternativeClickThrough()">
         <div class="status-options" @mouseleave="updateStateName('blank', 'hover')">
             <img src="../assets/icons/office.svg" alt="working from office"
                 @mouseover="updateStateName(states[1], 'hover')" @click="setStateName(states[1])" id="office" />
@@ -90,6 +107,8 @@ export default {
     padding-top: 16px;
     height: 112px;
     width: 138px;
+    cursor: pointer;
+    user-select: none;
 
     .status-options {
         display: flex;
