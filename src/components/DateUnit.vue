@@ -39,6 +39,10 @@ export default {
             event.stopPropagation();
             this.updateStateName(stateName, 'active');
             this.selectedState = stateName
+
+            /*if(this.remoteNote == 'Country'){
+                
+            }*/
         },
         onInput(e) {
             console.log(e.target.innerText);
@@ -92,7 +96,7 @@ export default {
         </div>
         <h2>{{ calDate.day }}</h2>
         <h3>{{ stateName }}</h3>
-        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @input="onPinput"
+        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @input="onPinput" @click.stop
             v-model="remoteNote" id="countryname" />
     </div>
 </template>
@@ -133,7 +137,7 @@ export default {
     h2 {
         font-size: 20px;
         font-weight: 700;
-        color: var(--default-base-color)
+        color: var(--default-base-color);
     }
 
     h3 {
