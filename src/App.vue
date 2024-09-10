@@ -60,19 +60,25 @@ export default {
       return today.toDateString() === date.toDateString();
     },
     downloadAsJpg() {
+
+      // Create the title element dynamically
+      const titleElement = document.createElement("h1");
+      titleElement.style.textAlign = "center";
+      titleElement.style.marginBottom = "24px";
+      titleElement.style.fontWeight = '700';
+
       const captureElement = document.getElementById('capture');
 
-      // Use html2canvas to capture the div as a canvas
+      titleElement.innerText = this.formattedMonthYear;
+      // Temporarily insert the title at the top of the capture element
+      captureElement.prepend(titleElement);
+
       html2canvas(captureElement).then(canvas => {
-        // Convert the canvas to a data URL in JPG format
-        const imgData = canvas.toDataURL('image/jpeg');
-
-        // Create a temporary link element
+        titleElement.innerText = this.formattedMonthYear;
+        captureElement.removeChild(titleElement);
         const link = document.createElement('a');
-        link.href = imgData;
-        link.download = this.formattedMonthYear + '.jpg'; // Set the desired file name
-
-        // Trigger the download
+        link.href = canvas.toDataURL('image/jpeg');
+        link.download = this.formattedMonthYear + '.jpg';
         link.click();
       });
     }

@@ -39,13 +39,9 @@ export default {
             event.stopPropagation();
             this.updateStateName(stateName, 'active');
             this.selectedState = stateName
-
-            /*if(this.remoteNote == 'Country'){
-                
-            }*/
         },
-        onInput(e) {
-            console.log(e.target.innerText);
+        handleChange(event) {
+            console.log("Input changed, value:", event.target.value);
         },
         alternativeClickThrough() {
             let localState
@@ -86,18 +82,18 @@ export default {
         :style="{ pointerEvents: this.calDate.date === null ? 'none' : 'auto' }" @click="alternativeClickThrough()">
         <div class="status-options" @mouseleave="updateStateName('blank', 'hover')">
             <img src="../assets/icons/office.svg" alt="working from office"
-                @mouseover="updateStateName(states[1], 'hover')" @click="setStateName(states[1])" id="office" />
+                @mouseover="updateStateName(states[1], 'hover')" @click="setStateName(states[1])" class="office" />
             <img src="../assets/icons/wfh.svg" alt="working from home" @mouseover="updateStateName(states[2], 'hover')"
-                @click="setStateName(states[2])" id="wfh" />
+                @click="setStateName(states[2])" class="wfh" />
             <img src="../assets/icons/remote.svg" alt="working remotely"
-                @mouseover="updateStateName(states[3], 'hover')" @click="setStateName(states[3])" id="remote" />
+                @mouseover="updateStateName(states[3], 'hover')" @click="setStateName(states[3])" class="remote" />
             <img src="../assets/icons/pto.svg" alt="out of office" @mouseover="updateStateName(states[4], 'hover')"
-                @click="setStateName(states[4])" id="pto" />
+                @click="setStateName(states[4])" class="pto" />
         </div>
         <h2>{{ calDate.day }}</h2>
         <h3>{{ stateName }}</h3>
-        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @input="onPinput" @click.stop
-            v-model="remoteNote" id="countryname" />
+        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'"
+            @change="handleChange" @click.stop v-model="remoteNote" />
     </div>
 </template>
 
@@ -249,14 +245,14 @@ export default {
         opacity: 1;
         color: var(--office-base-color);
 
-        #office {
+        .office {
             display: block;
             opacity: 1;
         }
 
-        #pto,
-        #remote,
-        #wfh {
+        .pto,
+        .remote,
+        .wfh {
             display: none;
         }
     }
@@ -272,14 +268,14 @@ export default {
         opacity: 1;
         color: var(--remote-base-color);
 
-        #remote {
+        .remote {
             display: block;
             opacity: 1;
         }
 
-        #pto,
-        #office,
-        #wfh {
+        .pto,
+        .office,
+        .wfh {
             display: none;
         }
     }
@@ -295,14 +291,14 @@ export default {
         opacity: 1;
         color: var(--pto-base-color);
 
-        #pto {
+        .pto {
             display: block;
             opacity: 1;
         }
 
-        #remote,
-        #office,
-        #wfh {
+        .remote,
+        .office,
+        .wfh {
             display: none;
         }
     }
@@ -317,14 +313,14 @@ export default {
         opacity: 1;
         color: var(--wfh-base-color);
 
-        #wfh {
+        .wfh {
             display: block;
             opacity: 1;
         }
 
-        #remote,
-        #office,
-        #pto {
+        .remote,
+        .office,
+        .pto {
             display: none;
         }
     }
