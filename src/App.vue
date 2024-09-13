@@ -148,7 +148,6 @@ export default {
   main {
     display: flex;
     flex-direction: column;
-
     .sidebar {
       padding: 24px;
     }
@@ -163,6 +162,7 @@ export default {
   main {
     display: flex;
     flex-direction: row;
+    align-items: stretch;
 
     .sidebar {
       padding: 40px;
