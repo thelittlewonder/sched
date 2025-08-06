@@ -24,5 +24,7 @@ body{
     --remote-offbase-color: #EBDEF0;
     --pto-base-color: #B9770C;
     --pto-offbase-color: #FDEBD0;
+    --holiday-offbase-color: #FCF3CF;
+    --holiday-base-color: #9A7D0A;
     --default-base-color: #17202A;
 }

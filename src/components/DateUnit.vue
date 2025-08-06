@@ -43,26 +43,32 @@ export default {
         handleChange(event) {
             console.log("Input changed, value:", event.target.value);
         },
-        alternativeClickThrough() {
-            let localState
-            this.count++
-            localState = this.states[this.count]
-            if (this.count == 5) {
-                this.count = 0
+        alternativeClickThrough(d) {
+            if (!d.isWeekend && !d.isPublicHoliday) {
+                let localState
+                this.count++
+                localState = this.states[this.count]
+                if (this.count == 5) {
+                    this.count = 0
+                }
+                if (this.count == 0) {
+                    this.currentState = 'hover-blank'
+                    this.stateName = this.states[0]
+                    this.selectedState = ''
+                } else {
+                    this.setStateName(localState)
+                }
             }
-            if (this.count == 0) {
-                this.currentState = 'hover-blank'
-                this.stateName = this.states[0]
-                this.selectedState = ''
+        },
+        getCurrentClass(d) {
+            if (d.isWeekend) {
+                return "weekend"
+            } else if (d.isPublicHoliday) {
+                return ("holiday")
             } else {
-                this.setStateName(localState)
+                return this.currentState;
             }
         }
-    },
-    computed: {
-        currentClass() {
-            return this.currentState;
-        },
     },
     props: {
         calDate: {
@@ -77,9 +83,11 @@ export default {
 };
 </script>
 
+
 <template>
-    <div class="default" @mouseenter="setState('hover-blank')" @mouseleave="resetState" :class="currentClass"
-        :style="{ pointerEvents: this.calDate.date === null ? 'none' : 'auto' }" @click="alternativeClickThrough()">
+    <div class="default" @mouseenter="setState('hover-blank')" @mouseleave="resetState"
+        :class="getCurrentClass(this.calDate)" :style="{ pointerEvents: this.calDate.date === null ? 'none' : 'auto' }"
+        @click="alternativeClickThrough(this.calDate)">
         <div class="status-options" @mouseleave="updateStateName('blank', 'hover')">
             <img src="../assets/icons/office.svg" alt="working from office"
                 @mouseover="updateStateName(states[1], 'hover')" @click="setStateName(states[1])" class="office" />
@@ -90,10 +98,12 @@ export default {
             <img src="../assets/icons/pto.svg" alt="out of office" @mouseover="updateStateName(states[4], 'hover')"
                 @click="setStateName(states[4])" class="pto" />
         </div>
+        <img v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend" src="../assets/icons/holiday.svg" alt="holiday"/>
         <h2>{{ calDate.day }}</h2>
+        <p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend">Holiday</p>
         <h3>{{ stateName }}</h3>
-        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'"
-            @change="handleChange" @click.stop v-model="remoteNote" />
+        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @change="handleChange" @click.stop
+            v-model="remoteNote" />
     </div>
 </template>
 
@@ -325,5 +335,27 @@ export default {
         }
     }
 
+}
+
+.weekend {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.holiday {
+    background-color: var(--holiday-offbase-color);
+    cursor: not-allowed;
+
+    p {
+        font-size: 12px;
+        color: var(--holiday-base-color);
+    }
+
+    img{
+        height: 20px;
+    }
+    .status-options {
+        display: none;
+    }
 }
 </style>

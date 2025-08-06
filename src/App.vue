@@ -1,6 +1,8 @@
 <script>
 import DateUnit from './components/DateUnit.vue'
 import html2canvas from 'html2canvas';
+import holidays from './assets/holidays.json'
+
 export default {
   name: 'App',
   components: {
@@ -8,7 +10,8 @@ export default {
   },
   data() {
     return {
-      currentDate: new Date() // Initialize with current date
+      currentDate: new Date(), // Initialize with current date
+      userCountry: ''
     };
   },
   computed: {
@@ -24,23 +27,52 @@ export default {
       const endOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
       const days = [];
 
+      const localeHolidays = holidays[this.userCountry] || []
+      console.log(localeHolidays, this.userCountry)
+
       // Fill in the days before the start of the month
       const startDay = (startOfMonth.getDay() === 0) ? 6 : startOfMonth.getDay() - 1; // Adjust for Monday start
       for (let i = 0; i < startDay; i++) {
-        days.push({ day: '', date: null });
+        days.push({ day: '', date: null, isWeekend: null, isPublicHoliday: null });
       }
 
       // Fill in the days of the month
       for (let i = 1; i <= endOfMonth.getDate(); i++) {
-        days.push({ day: i, date: new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), i) });
+        const date = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), i)
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const isPublicHoliday = localeHolidays.includes(date.toISOString().split('T')[0])
+        days.push({ day: i, date, isWeekend, isPublicHoliday });
+
       }
 
       // Fill in the days after the end of the month
       while (days.length < 35) { // Assuming 5 rows
-        days.push({ day: '', date: null });
+        days.push({ day: '', date: null, isWeekend: null, isPublicHoliday: null });
       }
 
       return days;
+    }
+  },
+  async mounted() {
+    try {
+      const res = await fetch('https://api.country.is/')
+      const data = await res.json()
+      this.userCountry = data.country 
+      if (this.userCountry == 'GB'){
+        this.userCountry = 'UK'
+      }
+      if (this.userCountry == 'US'){
+        this.userCountry = 'USA'
+      }
+    } catch (error) {
+      console.error('Error detecting country:', error)
+
+      const lang = navigator.language || navigator.userLanguage || ''
+      if (lang.startsWith('en-GB')) this.userCountry = 'UK'
+      else if (lang.startsWith('en-US')) this.userCountry = 'USA'
+      else if (lang.startsWith('fr')) this.userCountry = 'FR'
+      else if (lang.startsWith('en-IE')) this.userCountry = 'IE'
+      else this.userCountry = 'UK' // fallback default
     }
   },
   methods: {
@@ -148,6 +180,7 @@ export default {
   main {
     display: flex;
     flex-direction: column;
+
     .sidebar {
       padding: 24px;
     }
@@ -232,7 +265,7 @@ main {
         background-color: #F7F9F9;
         cursor: pointer;
         margin: 0;
-        padding: 0;
+        padding: 0 8px 0 0;
       }
     }
 
