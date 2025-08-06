@@ -28,7 +28,6 @@ export default {
       const days = [];
 
       const localeHolidays = holidays[this.userCountry] || []
-      console.log(localeHolidays, this.userCountry)
 
       // Fill in the days before the start of the month
       const startDay = (startOfMonth.getDay() === 0) ? 6 : startOfMonth.getDay() - 1; // Adjust for Monday start
@@ -41,7 +40,7 @@ export default {
         const date = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), i)
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
         const isPublicHoliday = localeHolidays.includes(date.toISOString().split('T')[0])
-        days.push({ day: i, date, isWeekend, isPublicHoliday });
+        days.push({ day: i, date, isWeekend, isPublicHoliday, country: this.userCountry });
 
       }
 

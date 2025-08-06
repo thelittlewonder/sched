@@ -100,7 +100,7 @@ export default {
         </div>
         <img v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend" src="../assets/icons/holiday.svg" alt="holiday"/>
         <h2>{{ calDate.day }}</h2>
-        <p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend">Holiday</p>
+        <p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend"> {{calDate.country}} Holiday</p>
         <h3>{{ stateName }}</h3>
         <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @change="handleChange" @click.stop
             v-model="remoteNote" />
