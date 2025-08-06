@@ -44,7 +44,8 @@ export default {
             console.log("Input changed, value:", event.target.value);
         },
         alternativeClickThrough(d) {
-            if (!d.isWeekend && !d.isPublicHoliday) {
+            //add condition later if (!d.isWeekend && !d.isPublicHoliday)
+            {
                 let localState
                 this.count++
                 localState = this.states[this.count]
@@ -61,10 +62,9 @@ export default {
             }
         },
         getCurrentClass(d) {
+            // update class later to else if (d.isPublicHoliday) {return ("holiday")}
             if (d.isWeekend) {
                 return "weekend"
-            } else if (d.isPublicHoliday) {
-                return ("holiday")
             } else {
                 return this.currentState;
             }
@@ -98,9 +98,9 @@ export default {
             <img src="../assets/icons/pto.svg" alt="out of office" @mouseover="updateStateName(states[4], 'hover')"
                 @click="setStateName(states[4])" class="pto" />
         </div>
-        <img v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend" src="../assets/icons/holiday.svg" alt="holiday"/>
+        <!-- img v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend" src="../assets/icons/holiday.svg" alt="holiday"/-->
         <h2>{{ calDate.day }}</h2>
-        <p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend"> {{calDate.country}} Holiday</p>
+        <!-- p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend"> {{calDate.country}} Holiday</p-->
         <h3>{{ stateName }}</h3>
         <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @change="handleChange" @click.stop
             v-model="remoteNote" />
@@ -342,7 +342,7 @@ export default {
     cursor: not-allowed;
 }
 
-.holiday {
+/*.holiday {
     background-color: var(--holiday-offbase-color);
     cursor: not-allowed;
 
@@ -357,5 +357,5 @@ export default {
     .status-options {
         display: none;
     }
-}
+}*/
 </style>
