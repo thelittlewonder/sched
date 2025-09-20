@@ -10,8 +10,9 @@ export default {
   },
   data() {
     return {
-      currentDate: new Date(), // Initialize with current date
-      userCountry: ''
+      currentDate: new Date(),
+      userCountry: '',
+      holidaysEnabled: true
     };
   },
   computed: {
@@ -22,57 +23,48 @@ export default {
       const options = { year: 'numeric', month: 'short' };
       return this.currentDate.toLocaleDateString(undefined, options);
     },
+    holidaySet() {
+      const list = holidays[this.userCountry] || [];
+      return new Set(list);
+    },
     daysInMonth() {
       const startOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
       const endOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
       const days = [];
-
-      const localeHolidays = holidays[this.userCountry] || []
-
-      // Fill in the days before the start of the month
       const startDay = (startOfMonth.getDay() === 0) ? 6 : startOfMonth.getDay() - 1; // Adjust for Monday start
       for (let i = 0; i < startDay; i++) {
         days.push({ day: '', date: null, isWeekend: null, isPublicHoliday: null });
       }
 
-      // Fill in the days of the month
       for (let i = 1; i <= endOfMonth.getDate(); i++) {
         const date = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), i)
         const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-        const isPublicHoliday = localeHolidays.includes(date.toISOString().split('T')[0])
+        const yyyyMmDd = this.toYMDLocal(date)
+        const isPublicHoliday = this.holidaysEnabled && this.holidaySet.has(yyyyMmDd);
         days.push({ day: i, date, isWeekend, isPublicHoliday, country: this.userCountry });
-
       }
 
-      // Fill in the days after the end of the month
-      while (days.length < 35) { // Assuming 5 rows
+      while (days.length % 7 !== 0) {
         days.push({ day: '', date: null, isWeekend: null, isPublicHoliday: null });
       }
 
       return days;
     }
   },
-  async mounted() {
-    try {
-      const res = await fetch('https://api.country.is/')
-      const data = await res.json()
-      this.userCountry = data.country 
-      if (this.userCountry == 'GB'){
-        this.userCountry = 'UK'
-      }
-      if (this.userCountry == 'US'){
-        this.userCountry = 'USA'
-      }
-    } catch (error) {
-      console.error('Error detecting country:', error)
+  mounted() {
+    const lang = navigator.language || navigator.userLanguage || 'en-GB';
+    if (lang.startsWith('en-GB')) this.userCountry = 'UK';
+    else if (lang.startsWith('en-US')) this.userCountry = 'USA';
+    else if (lang.startsWith('en-IE')) this.userCountry = 'IE';
+    else if (lang.startsWith('fr')) this.userCountry = 'FR';
+    else if (lang.startsWith('de')) this.userCountry = 'DE';
+    else if (lang.startsWith('en-SG') || lang.startsWith('ms-SG')) this.userCountry = 'SG';
+    else this.userCountry = 'UK'; // fallback
 
-      const lang = navigator.language || navigator.userLanguage || ''
-      if (lang.startsWith('en-GB')) this.userCountry = 'UK'
-      else if (lang.startsWith('en-US')) this.userCountry = 'USA'
-      else if (lang.startsWith('fr')) this.userCountry = 'FR'
-      else if (lang.startsWith('en-IE')) this.userCountry = 'IE'
-      else this.userCountry = 'UK' // fallback default
-    }
+    window.addEventListener("keydown", this.handleKeydown);
+  },
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.handleKeydown);
   },
   methods: {
     prevMonth() {
@@ -85,28 +77,27 @@ export default {
       const currentYear = this.currentDate.getFullYear();
       this.currentDate = new Date(currentYear, currentMonth + 1, 1);
     },
+    handleKeydown(e) {
+      if (e.key === "ArrowLeft") {
+        this.prevMonth();
+      } else if (e.key === "ArrowRight") {
+        this.nextMonth();
+      }
+    },
     isToday(date) {
-      if (!date) return false; // Handle null dates
+      if (!date) return false;
       const today = new Date();
       return today.toDateString() === date.toDateString();
     },
+    toYMDLocal(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    },
     downloadAsJpg() {
-
-      // Create the title element dynamically
-      const titleElement = document.createElement("h1");
-      titleElement.style.textAlign = "center";
-      titleElement.style.marginBottom = "24px";
-      titleElement.style.fontWeight = '700';
-
       const captureElement = document.getElementById('capture');
-
-      titleElement.innerText = this.formattedMonthYear;
-      // Temporarily insert the title at the top of the capture element
-      captureElement.prepend(titleElement);
-
       html2canvas(captureElement).then(canvas => {
-        titleElement.innerText = this.formattedMonthYear;
-        captureElement.removeChild(titleElement);
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/jpeg');
         link.download = this.formattedMonthYear + '.jpg';
@@ -120,31 +111,44 @@ export default {
 
 <template>
   <aside>
-    <p>This is a big screen activity dawg. <a href='https://threads.net/abh_.shek' class="threads">@ me</a> if you want.
+    <p>I don't have time for mobile responsiveness. I have a life.
     </p>
   </aside>
   <main>
-    <div class="sidebar">
-
+    <div class="calendar-wrapper" id="capture">
       <div class="actionbar">
-        <div class="slider">
+        <div class="dateSlider">
           <img src="./assets/icons/back.svg" alt="previous" @click="prevMonth" />
           <span>{{ formattedMonthYear }}</span>
           <img src="./assets/icons/forward.svg" alt="forward" @click="nextMonth" />
         </div>
-        <img src="./assets/icons/download.svg" alt="download image" class="download-btn" title="Download as jpg"
-          @click="downloadAsJpg" />
+        <label class="switch">
+          <input type="checkbox" v-model="holidaysEnabled" />
+          <span class="slider"></span>
+          <span class="label-text">Local holidays ({{ userCountry }})</span>
+        </label>
       </div>
+      <div class="calendar">
+        <div class="day-header">
+          <div class="day-name" v-for="day in dayNames" :key="day">{{ day }}</div>
+        </div>
+        <div class="grid">
+          <DateUnit v-for="day, index in daysInMonth" :calDate=day :key="day.date"
+            :is-locked="day.isWeekend || day.isPublicHoliday" />
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+
+      <button @click="downloadAsJpg" class="download-btn">
+        <img src="./assets/icons/download.svg" alt="download image" title="Download as jpg" />
+        <label>Download</label>
+      </button>
 
       <div class="details">
-        <p class="divider">
-          –
-        </p>
         <p class="memo"><span>sched</span> is a tiny utility to visualise your cal & share it with your colleagues,
           friends, and enemies.</p>
-        <p class="divider">
-          –
-        </p>
         <a href='https://threads.net/abh_.shek' class="threads"><img src="./assets/icons/threads.svg"
             alt="threads" />built by
           abh_.shek</a>
@@ -152,14 +156,7 @@ export default {
 
     </div>
 
-    <div class="calendar" id="capture">
-      <div class="day-header">
-        <div class="day-name" v-for="day in dayNames" :key="day">{{ day }}</div>
-      </div>
-      <div class="grid">
-        <DateUnit :calDate=day v-for="day in daysInMonth" :key="day.date" />
-      </div>
-    </div>
+
 
   </main>
 </template>
@@ -198,7 +195,7 @@ export default {
 
     .sidebar {
       padding: 40px;
-      max-width: 420px;
+      max-width: 300px;
     }
   }
 }
@@ -232,39 +229,33 @@ main {
   display: flex;
   max-width: 1800px;
 
-  .actionbar {
+  .sidebar {
+    background: #F7F9F9;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
 
     .download-btn {
-      cursor: pointer;
-    }
-  }
-
-  .sidebar {
-    background: #F7F9F9;
-
-    .divider {
-      margin: 24px 0;
-    }
-
-    .slider {
       display: flex;
+      flex-direction: row;
       align-items: center;
-      margin-bottom: 10px;
-      font-weight: 700;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      column-gap: 12px;
+      justify-content: center;
+      font-family: inherit;
+      gap: 0.75rem;
+      background-color: white;
+      border: 1px solid var(--default-base-color);
+      border-radius: 8px;
+      padding: 8px 16px;
 
-      img {
-        border: none;
-        background-color: #F7F9F9;
+      label {
         cursor: pointer;
-        margin: 0;
-        padding: 0 8px 0 0;
+      }
+
+      &:hover {
+        cursor: pointer;
+        scale: 0.99;
+        background-color: #F7F9F9;
+        transition: background-color 0.2s ease-in-out;
       }
     }
 
@@ -275,8 +266,8 @@ main {
       row-gap: 8px;
 
       .memo {
-        font-size: 14px;
-        line-height: 24px;
+        font-size: 12px;
+        line-height: 20px;
 
         span {
           font-weight: 700;
@@ -312,30 +303,133 @@ main {
     }
   }
 
-
-  .calendar {
+  .calendar-wrapper {
+    display: flex;
+    flex-direction: column;
     padding: 24px;
 
-    .day-header {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      text-align: center;
-      margin-bottom: 4px;
-      font-size: 12px;
-      color: var(--default-base-color);
+    .actionbar {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 20px;
+
+      .switch {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        --h: 18px; 
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        user-select: none;
+        font-size: 14px;
+        color: var(--default-base-color);
+
+        input {
+          position: absolute;
+          inset: 0 0 auto auto;
+          width: 40px;
+          height: var(--h);
+          opacity: 0;
+          cursor: inherit;
+        }
+
+        .slider {
+          position: relative;
+          width: 40px;
+          height: var(--h);
+          background-color: rgba(23, 32, 42, 0.2);
+          border-radius: var(--h);
+          transition: background-color 0.2s;
+          flex-shrink: 0;
+
+          &::before {
+            content: "";
+            position: absolute;
+            height: 12px; 
+            width: 12px;
+            left: 5px;
+            bottom: 3px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+          }
+        }
+
+        input:checked+.slider {
+          background-color: var(--default-base-color);
+
+          &::before {
+            transform: translateX(18px);
+          }
+        }
+
+        .label-text {
+          display: inline-flex;
+          align-items: center;
+          height: var(--h);
+          line-height: 1;
+          color: inherit;
+          opacity: 0.55;
+          transition: opacity 0.2s;
+        }
+
+        input:checked+.slider+.label-text {
+          opacity: 1;
+        }
+      }
+
+
+      .dateSlider {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        column-gap: 12px;
+
+        img {
+          border: none;
+          cursor: pointer;
+          margin: 0;
+          padding: 0 8px 0 0;
+        }
+      }
+
     }
 
-    .day-name {
-      padding: 20px 0;
-      background: #F7F9F9;
+
+    &:hover .switch {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
+    .calendar {
+      .day-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        margin-bottom: 4px;
+        font-size: 12px;
+        color: var(--default-base-color);
+      }
+
+      .day-name {
+        padding: 20px 0;
+        background: #F7F9F9;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+      }
     }
   }
-
 }
 </style>

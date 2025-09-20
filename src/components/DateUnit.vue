@@ -6,7 +6,6 @@ export default {
             selectedState: '',
             stateName: ' ',
             states: [" ", "Office", "WFH", "Remote", "PTO"],
-            remoteNote: 'Country',
             count: 0
         };
     },
@@ -25,6 +24,7 @@ export default {
             }
         },
         updateStateName(newText, stateType) {
+            if (this.isLocked && stateType !== 'render') return;
             if (newText == 'blank') {
                 if (!this.selectedState) {
                     this.stateName = ' '
@@ -36,6 +36,7 @@ export default {
             }
         },
         setStateName(stateName) {
+            if (this.isLocked) return;
             event.stopPropagation();
             this.updateStateName(stateName, 'active');
             this.selectedState = stateName
@@ -44,7 +45,7 @@ export default {
             console.log("Input changed, value:", event.target.value);
         },
         alternativeClickThrough(d) {
-            //add condition later if (!d.isWeekend && !d.isPublicHoliday)
+            if (this.isLocked) return;
             {
                 let localState
                 this.count++
@@ -62,15 +63,13 @@ export default {
             }
         },
         getCurrentClass(d) {
-            // update class later to else if (d.isPublicHoliday) {return ("holiday")}
-            if (d.isWeekend) {
-                return "weekend"
-            } else {
-                return this.currentState;
-            }
+            if (d.isWeekend) return 'weekend';
+            if (d.isPublicHoliday) return 'holiday'; // NEW if you have .holiday styles
+            return this.currentState;
         }
     },
     props: {
+        isLocked: { type: Boolean, default: false },
         calDate: {
             type: Object,
             required: true,
@@ -98,12 +97,10 @@ export default {
             <img src="../assets/icons/pto.svg" alt="out of office" @mouseover="updateStateName(states[4], 'hover')"
                 @click="setStateName(states[4])" class="pto" />
         </div>
-        <!-- img v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend" src="../assets/icons/holiday.svg" alt="holiday"/-->
+        <img v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend" src="../assets/icons/holiday.svg" alt="holiday"/>
         <h2>{{ calDate.day }}</h2>
-        <!-- p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend"> {{calDate.country}} Holiday</p-->
+        <p v-if="this.calDate.isPublicHoliday && !this.calDate.isWeekend"> Holiday</p>
         <h3>{{ stateName }}</h3>
-        <input v-if="this.selectedState == 'Remote' && this.stateName == 'Remote'" @change="handleChange" @click.stop
-            v-model="remoteNote" />
     </div>
 </template>
 
@@ -342,7 +339,7 @@ export default {
     cursor: not-allowed;
 }
 
-/*.holiday {
+.holiday {
     background-color: var(--holiday-offbase-color);
     cursor: not-allowed;
 
@@ -351,11 +348,12 @@ export default {
         color: var(--holiday-base-color);
     }
 
-    img{
+    img {
         height: 20px;
     }
+
     .status-options {
         display: none;
     }
-}*/
+}
 </style>
