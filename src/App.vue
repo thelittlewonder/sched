@@ -2,6 +2,7 @@
 import DateUnit from './components/DateUnit.vue'
 import html2canvas from 'html2canvas';
 import holidays from './assets/holidays.json'
+import confetti from "canvas-confetti";
 
 export default {
   name: 'App',
@@ -102,6 +103,11 @@ export default {
         link.href = canvas.toDataURL('image/jpeg');
         link.download = this.formattedMonthYear + '.jpg';
         link.click();
+        confetti({
+          particleCount: 120,
+          spread: 120,
+          origin: { y: 0.8, x:0.5 }
+        });
       });
     }
   }
@@ -317,7 +323,7 @@ main {
       .switch {
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
-        --h: 18px; 
+        --h: 18px;
         position: relative;
         display: inline-flex;
         align-items: center;
@@ -348,7 +354,7 @@ main {
           &::before {
             content: "";
             position: absolute;
-            height: 12px; 
+            height: 12px;
             width: 12px;
             left: 5px;
             bottom: 3px;

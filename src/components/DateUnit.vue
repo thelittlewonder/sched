@@ -41,9 +41,6 @@ export default {
             this.updateStateName(stateName, 'active');
             this.selectedState = stateName
         },
-        handleChange(event) {
-            console.log("Input changed, value:", event.target.value);
-        },
         alternativeClickThrough(d) {
             if (this.isLocked) return;
             {

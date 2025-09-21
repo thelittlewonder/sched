@@ -11,6 +11,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "canvas-confetti": "^1.9.3",
     "html2canvas": "^1.4.1",
     "vue": "^3.4.29"
   },
