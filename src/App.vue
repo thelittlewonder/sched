@@ -106,7 +106,7 @@ export default {
         confetti({
           particleCount: 120,
           spread: 120,
-          origin: { y: 0.8, x:0.5 }
+          origin: { y: 0.8, x: 0.5 }
         });
       });
     }
@@ -117,8 +117,7 @@ export default {
 
 <template>
   <aside>
-    <p>I don't have time for mobile responsiveness. I have a life.
-    </p>
+    <p>This is a big screen activity dawg. <a href='https://threads.net/abh_.shek' class="threads">@ me</a> if you want.</p>
   </aside>
   <main>
     <div class="calendar-wrapper" id="capture">
